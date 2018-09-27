@@ -1,0 +1,21 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "forms-da-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/formsDa/FormsDaWebPart.js",
+          "manifest": "./src/webparts/formsDa/FormsDaWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {
+    "jquery": "node_modules/jquery/dist/jquery.min.js",
+    "jqueryui": "node_modules/jqueryui/jquery-ui.min.js"
+  },
+  "localizedResources": {
+    "FormsDaWebPartStrings": "lib/webparts/formsDa/loc/{locale}.js"
+  }
+}
