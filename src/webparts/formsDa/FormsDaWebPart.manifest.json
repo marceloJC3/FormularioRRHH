@@ -18,7 +18,7 @@
     "group": { "default": "Other" },
     "title": { "default": "FormsDA" },
     "description": { "default": "Formulario SPFX de Dia Administrativo." },
-    "officeFabricIconFontName": "Page",
+    "officeFabricIconFontName": "ActivateOrders",
     "properties": {
       "description": "FormsDA"
     }
