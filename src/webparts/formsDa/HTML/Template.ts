@@ -15,7 +15,7 @@ export default class TemplateHTML {
                     <p>Disponible:</p>
                     <input type="text" name="nombre" value="" id="txtDisponible" disabled="">
                 </div>
-               <div class="input">
+               <div class="input" id="boxDiaSolicitar">
                     <p>Día a solicitar: </p><div class="rojo">(*)</div><p></p><input type="text" id="txtDia" name="desde" readonly>
                 </div>
             <div class="boton-enviar">

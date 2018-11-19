@@ -30,12 +30,13 @@ export default class N_Empleado implements I_Empleado {
             } else if (Environment.type == EnvironmentType.SharePoint || Environment.type == EnvironmentType.ClassicSharePoint) {
 
                 pnp.sp.web.lists.getByTitle(M_Lista.D_Lista.listaEmpleado).items
-                    .select("Title", "DiaAdministrativo", "Area/Title", "Area/ID")
+                    .select("*","Title", "DiaAdministrativo", "Area/Title", "Area/ID","Usuario/Title","Usuario/EMail")
                     .filter(`UsuarioId eq '${usuarioId}'`)
-                    .expand("Area")
+                    .expand("Area","Usuario")
                     .top(1)
                     .get().then((data: any) => {
                         if (data.length > 0) {
+                            debugger;
                             resolve(data[0]);
                         }
                     });

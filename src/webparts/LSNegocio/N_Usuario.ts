@@ -9,6 +9,7 @@ export default class N_Usuario implements I_Usuario {
     public ID: number;
     public Title: string;
     public Email?: string;
+    public EMail?: string;
     public LoginName?: string;
     
 

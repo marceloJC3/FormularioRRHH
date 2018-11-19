@@ -23,7 +23,9 @@ export interface I_Empleado {
     Area?: I_Area;
     AreaId?: number;
     DiaAdministrativo?: number;
+    
 }
+
 
 export interface I_Area {
     ID: number;
@@ -40,6 +42,7 @@ export interface I_Usuario {
     Id?: number;
     Title?: string;
     Email?: string;
+    EMail?: string;
     LoginName?: string;
 }
 

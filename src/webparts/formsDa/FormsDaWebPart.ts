@@ -18,11 +18,12 @@ export interface IFormsDaWebPartProps {
 
 import Template from './HTML/Template';
 import M_Lista from '../LSNegocio/M_Lista';
-//import N_DiaAdmin from './../LSNegocio/N_DiaAdmin';
+import N_DiaAdmin from './../LSNegocio/N_DiaAdmin';
 import N_Empleado from './../LSNegocio/N_Empleado';
 import N_Usuario from './../LSNegocio/N_Usuario';
+import N_Rol from './../LSNegocio/N_Rol';
 import { I_Empleado, I_Area, I_Usuario, I_DiaAdmin, I_Rol, I_OperacionInterna } from '../LSNegocio/Interfaces';
-import { H_QueryString } from '../LSNegocio/Helper';
+import { H_QueryString,H_Function } from '../LSNegocio/Helper';
 
 
 
@@ -51,8 +52,15 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
   /* Creacion */
 
   private ctx_usuario: I_Usuario = null;
+  private ctx_aprobador: I_Usuario = null;
+
+  private L_Roles:I_Rol[]=[];
+
+  private L_Rol:I_Rol=null;
 
   private L_Empleado: I_Empleado = null;
+
+  private L_DiaAdmin: I_DiaAdmin = null;
 
   private txt_diaAdministrativo: Element;
 
@@ -63,6 +71,27 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
   private btn_enviar: Element;
 
   private btn_cancelar: Element;
+
+
+  /*Aprobacion*/
+
+  private txt_userAprobador: Element;
+
+  private txt_cargo: Element;
+
+  private txt_mensaje: Element;
+
+  private txt_fechaRespuesta: Element;
+
+  private txt_estado: Element;
+
+  private btn_exportar: Element;
+
+
+
+
+
+
 
   private DatePickerOptions: JQueryUI.DatepickerOptions = {
     dateFormat: "dd/mm/yy",
@@ -76,7 +105,7 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
   constructor() {
     super();
 
-
+    SPComponentLoader.loadCss('//https://latinshare.sharepoint.com/sites/rrhh/_catalogs/masterpage/RRHH/css/responsive.css');
     SPComponentLoader.loadCss('//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
 
 
@@ -93,6 +122,8 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
           this.domElement.innerHTML = OP.Estado ? Template.HTMLCrear : Template.HTMLError;
           if (OP.Estado) {
             this.FillControlCrear();
+
+
             //    this.CargarInformacionInicial();
           }
 
@@ -107,6 +138,19 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
         break;
 
       case M_Lista.D_TipoVista[2].key:
+
+
+        this.obtener_informacionLectura().then(OP => {
+
+          this.domElement.innerHTML = OP.Estado ? Template.HTMLLectura : Template.HTMLError;
+          if (OP.Estado) {
+            this.FillControlLectura();
+
+            //    this.CargarInformacionInicial();
+          }
+
+
+        });
 
         break;
 
@@ -134,7 +178,20 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
             this.L_Empleado = empleado;
             operacion = (this.L_Empleado != null) ? { ID: 1, Estado: true, Mensaje: "OK" } : { ID: 1, Estado: true, Mensaje: "Fallo el obtener Empleado" };
 
-            resolve(operacion);
+            if(operacion.Estado){
+
+              new N_Rol().obtenerRolActual(this.L_Empleado.AreaId).then((rol)=>{
+
+
+                this.L_Rol = rol;
+                operacion = (this.L_Roles!= null) ? { ID: 1, Estado: true, Mensaje: "OK" } : { ID: 1, Estado: true, Mensaje: "Fallo el obtener Roles" };
+                
+                resolve(operacion);
+
+
+              });
+
+            }
 
           });
 
@@ -186,7 +243,8 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
     this.btn_enviar = this.domElement.querySelector("#btnEnviar");
     this.btn_enviar.addEventListener("click", () => {
 
-      alert("Crear Elemento");//this.CrearForm();
+      this.CrearDiaAdmin();
+      console.log("Crear Elemento");//this.CrearForm();
 
     });
 
@@ -196,9 +254,116 @@ export default class FormsDaWebPart extends BaseClientSideWebPart<IFormsDaWebPar
 
     (<HTMLInputElement>this.txt_diaAdministrativo).value = this.L_Empleado.DiaAdministrativo.toString();
 
+    if (this.L_Empleado.DiaAdministrativo > 0) {
+
+      $("#txtDia,#btnEnviar").show();
+
+
+    } else {
+
+      $("#txtDia,#btnEnviar,#boxDiaSolicitar").hide();
+      $(".boton-enviar").append("<p>No tiene dias disponibles</p>");
+
+    }
+
   }
 
+  private CrearDiaAdmin(): void {
+    
 
+
+    let hoy = new Date();
+    let fechaSolicitar=$("#txtDia").val();
+    let nombre = "FDA-" + hoy.getMonth().toString() + "-" + hoy.getFullYear().toString()
+    let diaAdmin = new N_DiaAdmin();
+    diaAdmin.Title = nombre;
+    diaAdmin.EstadoSolicitud = M_Lista.D_EstadoFormulario.Pendiente_Aprobacion_RRHH;
+    diaAdmin.DiasSolicitados = 1;
+    diaAdmin.DiaASolicitar =  H_Function.convertDate(fechaSolicitar);
+    diaAdmin.SolicitanteId = this.ctx_usuario.Id;
+    diaAdmin.AprobadorId=this.L_Rol.UsuarioId;//Filtrar previamente cual esta activo
+    diaAdmin.CargoAprobador=this.L_Rol.Cargo;
+    
+
+    new N_DiaAdmin().GuardarSimple(diaAdmin).then((flag) => {
+
+      if (flag) {
+
+        alert("Se guardo Exitosamente");
+
+      } else {
+
+        alert("Ocurrio un problema.");
+      }
+
+    });
+
+  }
+
+  private obtener_informacionLectura(): Promise<I_OperacionInterna> {
+    return new Promise<I_OperacionInterna>((resolve) => {
+
+      let flag: boolean = false;
+      let vID: string = H_QueryString.getParameter("vID", "");
+      let operacion: I_OperacionInterna = null;
+      let idDiaAdmin: number = parseInt((vID != "") ? vID : "1");
+
+      new N_Usuario().obtenerUsuarioActual().then((usuarioConcurrente) => {
+
+        this.ctx_usuario = usuarioConcurrente;
+
+        flag = (this.ctx_usuario != null) ? true : false;
+
+        if (flag) {
+
+
+          new N_DiaAdmin().obtenerDiaAdministrativo(idDiaAdmin).then((diaAdmin) => {
+
+            this.L_DiaAdmin = diaAdmin;
+            operacion = (this.L_DiaAdmin != null) ? { ID: 1, Estado: true, Mensaje: "OK" } : { ID: 1, Estado: true, Mensaje: "Fallo el obtener DiaAdministrativo" };
+            resolve(operacion);
+
+          });
+        } else {
+
+          operacion = { ID: 0, Estado: flag, Mensaje: "Error al obtener el usuario" };
+
+          resolve(operacion);
+
+        }
+
+      });
+
+
+    });
+  }
+
+  private FillControlLectura(): void {
+
+
+    //Definir todos los campos asociados al webpart
+    this.txt_diaAdministrativo = this.domElement.querySelector("#txtDisponible");
+    this.txt_user = this.domElement.querySelector("#txtUser");
+    this.txt_diaDisponible = this.domElement.querySelector("#txtDia");
+    this.txt_userAprobador = this.domElement.querySelector("txtUser2");
+    this.txt_cargo = this.domElement.querySelector("txtCargo");
+    this.txt_mensaje = this.domElement.querySelector("txtMotivo");
+    this.txt_fechaRespuesta = this.domElement.querySelector("txtFecha");
+    this.txt_estado = this.domElement.querySelector("txtEstado");
+
+    debugger;
+
+    (<HTMLInputElement>this.txt_diaAdministrativo).value = this.L_DiaAdmin.DiaASolicitar.toString();
+    (<HTMLInputElement>this.txt_user).value = this.L_DiaAdmin.Solicitante.Title;
+    (<HTMLInputElement>this.txt_diaDisponible).value = this.L_DiaAdmin.DiasSolicitados.toString();//Evaluar
+    (<HTMLInputElement>this.txt_userAprobador).value = this.L_DiaAdmin.Aprobador.Title;
+    (<HTMLInputElement>this.txt_cargo).value = this.L_DiaAdmin.CargoAprobador;
+    //(<HTMLInputElement>this.txt_mensaje).value =this.L_DiaAdmin.MotivoRechazo;
+    (<HTMLInputElement>this.txt_fechaRespuesta).value = this.L_DiaAdmin.FechaAprobacion.toString();
+    (<HTMLInputElement>this.txt_estado).value = this.L_DiaAdmin.EstadoSolicitud;
+
+    $("#pnlAprobador").show();
+  }
 
   protected get dataVersion(): Version {
     return Version.parse('1.0');

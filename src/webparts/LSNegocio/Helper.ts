@@ -11,4 +11,21 @@ export class H_QueryString {
        
     }
 
+
+}
+
+export class H_Function{
+
+public static convertDate(str) {
+    if (str == "" || str == null) {
+        return "";
+
+    } else {
+        var date = str.split("/");
+        date = date[2] + "-" + date[1] + "-" + date[0] + " 12:00:00";
+
+        return date;
+    }
+}
+    
 }
