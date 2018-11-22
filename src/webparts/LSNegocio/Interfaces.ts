@@ -40,6 +40,7 @@ export interface I_OperacionInterna {
 
 export interface I_Usuario {
     Id?: number;
+    ID?: number;
     Title?: string;
     Email?: string;
     EMail?: string;
@@ -47,7 +48,7 @@ export interface I_Usuario {
 }
 
 export interface I_Rol {
-    Id?: number;
+    ID?: number;
     Title?: string;
     EstadoFuncionario?: string;
     Area?: I_Area;

@@ -26,9 +26,9 @@ export default class N_DiaAdmin implements I_DiaAdmin {
 
     }
 
-    public obtenerDiaAdministrativo(IdDiaAdmin: number): Promise<I_Empleado> {
+    public obtenerDiaAdministrativo(IdDiaAdmin: string): Promise<I_DiaAdmin> {
 
-        return new Promise<I_Empleado>((resolve) => {
+        return new Promise<I_DiaAdmin>((resolve) => {
 
             if (Environment.type === EnvironmentType.Local) {
 
@@ -36,7 +36,7 @@ export default class N_DiaAdmin implements I_DiaAdmin {
             } else if (Environment.type == EnvironmentType.SharePoint || Environment.type == EnvironmentType.ClassicSharePoint) {
 
                 pnp.sp.web.lists.getByTitle(M_Lista.D_Lista.listaDiaAdministrativo).items
-                    .select("*","Solicitante/Title","Solicitante/EMail","Aprobador/Title","Aprobador/EMail")
+                    .select("*","Solicitante/Title","Solicitante/ID","Solicitante/EMail","Aprobador/Title","Aprobador/ID","Aprobador/EMail")
                     .filter(`ID eq '${IdDiaAdmin}'`)
                     .expand("Solicitante","Aprobador")
                     .top(1)
@@ -62,6 +62,22 @@ export default class N_DiaAdmin implements I_DiaAdmin {
                 });
 
             }
+        });
+    }
+
+       public ActualizarDiaAdmin(diaAdmin: I_DiaAdmin): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+
+            if (Environment.type === EnvironmentType.Local) {
+                console.log("agregar app");
+
+            } else if (Environment.type == EnvironmentType.SharePoint || Environment.type == EnvironmentType.ClassicSharePoint) {
+
+                 pnp.sp.web.lists.getByTitle(M_Lista.D_Lista.listaDiaAdministrativo).items.getById(diaAdmin.ID).update(diaAdmin).then((iar: ItemAddResult) => {
+                        resolve(true);
+                });
+
+                 }
         });
     }
 

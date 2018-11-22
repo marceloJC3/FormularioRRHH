@@ -46,7 +46,6 @@ body {
     position: relative;
     border: 1px solid #ccc;
     padding-bottom: 20px;
-    overflow-y: scroll;
     height: 100%;
 
 }
@@ -187,9 +186,13 @@ div input[type="number"] {
 }
 
 .boton-enviar{
+    width: 100%;
     display: block;
     margin-left: auto;
     margin-right: auto;
+    margin: 0;
+    float: left;
+    text-align: center;
 }
 
 #numDias {
@@ -507,7 +510,7 @@ display:none !important;
 }
 
 #txtEstado {
-	width:150px;
+	width:255px !important;
 }
 
 #txtUser {

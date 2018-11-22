@@ -27,5 +27,22 @@ public static convertDate(str) {
         return date;
     }
 }
+
+public static  convertDateInverse(t) {
+    if (t == "" || t == null) {
+        return "";
+
+    } else {
+
+
+        var newMonth = t.substr(5, 2);
+        var newDate = t.substr(8, 2);
+        var newYear = t.substr(0, 4);
+
+        return newDate + "/" + newMonth + "/" + newYear;
+    }
+
+
+}
     
 }

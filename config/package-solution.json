@@ -3,7 +3,7 @@
   "solution": {
     "name": "forms-rrhh-client-side-solution",
     "id": "681e5305-2523-44f7-b3ce-c76f9b902cf5",
-    "version": "1.0.0.0",
+    "version": "1.0.0.2",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true
   },

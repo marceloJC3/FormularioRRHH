@@ -36,7 +36,6 @@ export default class N_Empleado implements I_Empleado {
                     .top(1)
                     .get().then((data: any) => {
                         if (data.length > 0) {
-                            debugger;
                             resolve(data[0]);
                         }
                     });

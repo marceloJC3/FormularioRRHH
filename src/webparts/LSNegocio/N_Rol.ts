@@ -5,7 +5,7 @@ import pnp, { List, ListEnsureResult, ItemAddResult, FieldAddResult, CamlQuery }
 
 export default class N_Rol implements I_Rol {
 
-    Id?: number;
+    ID?: number;
     Title?: string;
     EstadoFuncionario?: string;
     Area?: I_Area;
@@ -53,8 +53,33 @@ export default class N_Rol implements I_Rol {
             } else if (Environment.type == EnvironmentType.SharePoint || Environment.type == EnvironmentType.ClassicSharePoint) {
 
                 pnp.sp.web.lists.getByTitle(M_Lista.D_Lista.listaRoles).items
-                    .select("*", "Title", "EstadoFuncionario","Cargo", "Area/Title", "Area/ID", "Usuario/Title", "Usuario/EMail")
+                    .select("*", "Title", "EstadoFuncionario","Cargo", "Area/Title", "Area/ID","Usuario/ID", "Usuario/Title", "Usuario/EMail")
                     .filter(`AreaId eq '${areaId}' and EstadoFuncionario eq 'Activo'`)
+                    .expand("Area", "Usuario")
+                    .top(1)
+                    .get().then((data: any) => {
+                        if (data.length > 0) {
+                            resolve(data[0]);
+                        }
+                    });
+
+            }
+        });
+    }
+
+    
+     public obtenerRolActualRRHH(area: string): Promise<I_Rol> {
+
+        return new Promise<I_Rol>((resolve) => {
+
+            if (Environment.type === EnvironmentType.Local) {
+
+
+            } else if (Environment.type == EnvironmentType.SharePoint || Environment.type == EnvironmentType.ClassicSharePoint) {
+
+                pnp.sp.web.lists.getByTitle(M_Lista.D_Lista.listaRoles).items
+                    .select("*", "Title", "EstadoFuncionario","Cargo", "Area/Title", "Area/ID", "Usuario/Title","Usuario/ID", "Usuario/EMail")
+                    .filter(`Area/Title eq '${area}' and EstadoFuncionario eq 'Activo'`)
                     .expand("Area", "Usuario")
                     .top(1)
                     .get().then((data: any) => {

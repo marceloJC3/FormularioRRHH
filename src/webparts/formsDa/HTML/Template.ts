@@ -19,8 +19,8 @@ export default class TemplateHTML {
                     <p>Día a solicitar: </p><div class="rojo">(*)</div><p></p><input type="text" id="txtDia" name="desde" readonly>
                 </div>
             <div class="boton-enviar">
-                <input id="btnEnviar" type="button" value="Enviar Solicitud" style="display:inline;">  
-                <input id="btnCancelar" type="button" value="Cancelar" style="display:inline;float:left">
+                <input id="btnEnviar" type="button" value="Enviar Solicitud" style="display:inline;margin: 0;float: none;">  
+                <input id="btnCancelar" type="button" value="Cancelar" style="display:inline;margin: 0;float: none;">
             </div>
             </div>
         </div>
@@ -123,12 +123,12 @@ export default class TemplateHTML {
                         </div>
 
                         <div class="input" id="pnlEstadoSolicitud">
-                            <p>Estado: </p><input id="txtEstado" type="text" name="Estado" disabled/>
+                            <p>Estado: </p><input id="txtEstado" type="text" name="Estado" disabled syle="width:255px;"/>
                         </div>
 
 
                     <div class="boton-enviar" id="pnlBotnesAprobacion">
-                        <input id="btnAprobar"  type="button" value="Aprobar"/>  
+                        <input id="btnAprobar"  type="button" value="Aprobar" />  
                         <input id="btnRechazar"  type="button" value="Rechazar" />
                     </div>
 
